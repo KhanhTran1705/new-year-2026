@@ -30,12 +30,15 @@
     <div id="happy" data-text="Happy"><h2>Happy</h2></div>
     <div id="newyear" data-text="New Year 2023"><h1>New Year 2026</h1></div>
     
+    <button id="ny-play-btn" style="position:fixed;right:16px;bottom:16px;padding:10px 14px;background:#ff4757;color:#fff;border:none;border-radius:6px;font-size:16px;z-index:9999;display:none;">Bật âm thanh</button>
+    
         <script>
             // Use local fireworks MP3 provided by the user
             const audioSrc = 'fireworks-29629.mp3'; // Update the path as needed
             const audioEl = document.createElement('audio');
             audioEl.id = 'ny-audio';
             audioEl.src = audioSrc;
+            audioEl.volume = 1.0;
             audioEl.preload = 'auto';
             document.body.appendChild(audioEl);
 
@@ -54,7 +57,8 @@
                 const playPromise = audioEl.play();
                 if(playPromise !== undefined){
                     playPromise.catch(() => {
-                        // If autoplay blocked, wait for explicit user interaction (handled below)
+                        const btn = document.getElementById('ny-play-btn');
+                        if(btn) btn.style.display = 'block';
                     });
                 }
             }
@@ -67,9 +71,20 @@
             // Fallback: start on first user interaction if autoplay was blocked
             function interactionHandler(){
                 startFireworksAndSound();
+                const btn = document.getElementById('ny-play-btn');
+                if(btn) btn.style.display = 'none';
                 ['click','keydown','touchstart','pointerdown'].forEach(ev => window.removeEventListener(ev, interactionHandler));
             }
             ['click','keydown','touchstart','pointerdown'].forEach(ev => window.addEventListener(ev, interactionHandler));
+
+            // Play button: explicitly start audio+fireworks on mobile/user tap
+            const playBtn = document.getElementById('ny-play-btn');
+            if(playBtn){
+                playBtn.addEventListener('click', function(){
+                    startFireworksAndSound();
+                    playBtn.style.display = 'none';
+                });
+            }
         </script>
 </body>
 </html>
